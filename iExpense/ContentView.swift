@@ -5,6 +5,7 @@
 //  Created by Ali Syed on 2025-07-21.
 //
 
+import Observation
 import SwiftUI
 
 struct ContentView: View {
