@@ -10,15 +10,28 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var user = User()
+    @State private var showSheet = false
     
     var body: some View {
-        VStack {
-            Text("Your name is \(user.firstName) \(user.lastName).")
-            
-            TextField("First name", text: $user.firstName)
-            TextField("Last name", text: $user.lastName)
+        Button("Show Sheet") {
+            showSheet.toggle()
         }
-        .padding()
+        .sheet(isPresented: $showSheet) {
+            SecondView(name: "Ali Syed")
+        }
+    }
+}
+
+struct SecondView: View {
+    @Environment(\.dismiss) var dismiss
+    
+    let name: String
+    
+    var body: some View {
+        Text("Name: \(name)")
+        Button("Dismiss") {
+            dismiss()
+        }
     }
 }
 
