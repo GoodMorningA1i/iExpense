@@ -9,36 +9,21 @@ import Observation
 import SwiftUI
 
 struct ContentView: View {
-    @State private var arrNum: [Int] = []
-    @State private var count = 0
+    struct User: Codable {
+        let firstName: String
+        let lastName: String
+    }
     
+    @State private var user = UserDefaults.standard.data(forKey: "user")
+
     var body: some View {
-        NavigationStack {
-            VStack {
-                List {
-                    ForEach(arrNum, id: \.self) { num in
-                        Text("\(num)")
-                    }
-                    .onDelete(perform: removeRows)
-                }
-                
-                Button("Generate new number") {
-                    generateNewNumber()
-                }
-            }
-            .toolbar {
-                EditButton()
+        Button("Save User") {
+            let encoder = JSONEncoder()
+            
+            if let data = try? encoder.encode(user) {
+                UserDefaults.standard.set(data, forKey: "user")
             }
         }
-    }
-    
-    func generateNewNumber() {
-        arrNum.append(count)
-        count += 1
-    }
-    
-    func removeRows(at offsets: IndexSet) {
-        arrNum.remove(atOffsets: offsets)
     }
 }
 
