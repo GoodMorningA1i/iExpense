@@ -9,36 +9,37 @@ import Observation
 import SwiftUI
 
 struct ContentView: View {
-    @State private var user = User()
-    @State private var showSheet = false
+    @State private var arrNum: [Int] = []
+    @State private var count = 0
     
     var body: some View {
-        Button("Show Sheet") {
-            showSheet.toggle()
-        }
-        .sheet(isPresented: $showSheet) {
-            SecondView(name: "Ali Syed")
-        }
-    }
-}
-
-struct SecondView: View {
-    @Environment(\.dismiss) var dismiss
-    
-    let name: String
-    
-    var body: some View {
-        Text("Name: \(name)")
-        Button("Dismiss") {
-            dismiss()
+        NavigationStack {
+            VStack {
+                List {
+                    ForEach(arrNum, id: \.self) { num in
+                        Text("\(num)")
+                    }
+                    .onDelete(perform: removeRows)
+                }
+                
+                Button("Generate new number") {
+                    generateNewNumber()
+                }
+            }
+            .toolbar {
+                EditButton()
+            }
         }
     }
-}
-
-@Observable
-class User {
-    var firstName = "Bilbo"
-    var lastName = "Baggins"
+    
+    func generateNewNumber() {
+        arrNum.append(count)
+        count += 1
+    }
+    
+    func removeRows(at offsets: IndexSet) {
+        arrNum.remove(atOffsets: offsets)
+    }
 }
 
 #Preview {
