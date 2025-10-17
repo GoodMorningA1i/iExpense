@@ -8,22 +8,65 @@
 import Observation
 import SwiftUI
 
-struct ContentView: View {
-    struct User: Codable {
-        let firstName: String
-        let lastName: String
-    }
-    
-    @State private var user = UserDefaults.standard.data(forKey: "user")
-
-    var body: some View {
-        Button("Save User") {
-            let encoder = JSONEncoder()
-            
-            if let data = try? encoder.encode(user) {
-                UserDefaults.standard.set(data, forKey: "user")
+@Observable
+class Expenses {
+    var items = [ExpenseItem]() {
+        didSet {
+            if let encoded = try? JSONEncoder().encode(items) {
+                UserDefaults.standard.set(encoded, forKey: "Items")
             }
         }
+    }
+    
+    init() {
+        if let savedItems = UserDefaults.standard.data(forKey: "Items") {
+            if let decodedItems = try? JSONDecoder().decode([ExpenseItem].self, from: savedItems) {
+                items = decodedItems
+                return
+            }
+        }
+        
+        items = []
+    }
+}
+
+struct ContentView: View {
+    @State private var expenses = Expenses()
+    @State private var showingAddExpense = false
+    
+    var body: some View {
+        NavigationStack {
+            List {
+                ForEach(expenses.items) { item in
+                    
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(item.name)
+                                .font(.headline)
+                            Text(item.type)
+                        }
+                        
+                        Spacer()
+                        
+                        Text(item.amount, format: .currency(code: "USD"))
+                    }
+                }
+                .onDelete(perform: removeItems)
+            }
+            .navigationTitle("iExpense")
+            .toolbar {
+                Button("Add Expense", systemImage: "plus") {
+                    showingAddExpense = true
+                }
+            }
+            .sheet(isPresented: $showingAddExpense) {
+                AddView(expenses: expenses)
+            }
+        }
+    }
+    
+    func removeItems(at offsets: IndexSet) {
+        expenses.items.remove(atOffsets: offsets)
     }
 }
 
